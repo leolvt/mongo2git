@@ -1,0 +1,55 @@
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj :
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+
+      - name: Check formatting
+        run: make fmt-check
+
+      - name: Verify module files
+        run: make tidy-check
+
+      - name: Run go vet
+        run: make vet
+
+      - name: Run linter
+        run: make lint
+
+      - name: Run tests
+        run: make test
+
+      - name: Verify builds
+        run: make build
+
+      - name: Validate GoReleaser config
+        run: make release-check
+
+      - name: Validate release build
+        run: make release-snapshot
