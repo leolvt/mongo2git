@@ -34,7 +34,7 @@ func TestIDToFilename(t *testing.T) {
 		},
 		{
 			name: "non-UUID binary (subtype 0)",
-			doc: bson.M{"_id": bson.Binary{Subtype: 0, Data: []byte{0xde, 0xad, 0xbe, 0xef}}},
+			doc:  bson.M{"_id": bson.Binary{Subtype: 0, Data: []byte{0xde, 0xad, 0xbe, 0xef}}},
 			want: "binary-deadbeef",
 		},
 		{

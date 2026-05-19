@@ -55,8 +55,8 @@ func TestResolve(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.envVal != "" {
-				os.Setenv(key, tt.envVal)
-				t.Cleanup(func() { os.Unsetenv(key) })
+				_ = os.Setenv(key, tt.envVal)
+				t.Cleanup(func() { _ = os.Unsetenv(key) })
 			}
 			got, err := resolve(tt.flagVal, key)
 			if tt.wantErr {
@@ -91,8 +91,8 @@ func TestResolveOptional(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.envVal != "" {
-				os.Setenv(key, tt.envVal)
-				t.Cleanup(func() { os.Unsetenv(key) })
+				_ = os.Setenv(key, tt.envVal)
+				t.Cleanup(func() { _ = os.Unsetenv(key) })
 			}
 			got := resolveOptional(tt.flagVal, key, tt.defVal)
 			if got != tt.want {
@@ -123,10 +123,10 @@ func TestOrDefault(t *testing.T) {
 
 func TestFlagName(t *testing.T) {
 	tests := map[string]string{
-		"MONGO_URI":          "mongo-uri",
-		"MONGO_COLLECTION":   "mongo-collection",
-		"REPO_URL":           "repo-url",
-		"SLACK_WEBHOOK_URL":  "slack-webhook-url",
+		"MONGO_URI":         "mongo-uri",
+		"MONGO_COLLECTION":  "mongo-collection",
+		"REPO_URL":          "repo-url",
+		"SLACK_WEBHOOK_URL": "slack-webhook-url",
 	}
 	for envKey, want := range tests {
 		t.Run(envKey, func(t *testing.T) {
@@ -148,8 +148,8 @@ func TestConfigValidate(t *testing.T) {
 
 	t.Run("unwritable parent", func(t *testing.T) {
 		parent := t.TempDir()
-		os.Chmod(parent, 0o000)
-		t.Cleanup(func() { os.Chmod(parent, 0o755) })
+		_ = os.Chmod(parent, 0o000)
+		t.Cleanup(func() { _ = os.Chmod(parent, 0o755) })
 		c := Config{CloneDir: filepath.Join(parent, "repo")}
 		if err := c.Validate(); err == nil {
 			t.Fatal("expected error for unwritable parent")

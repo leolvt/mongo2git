@@ -47,18 +47,18 @@ func ParseFlags() (Config, error) {
 
 	flag.Usage = func() {
 		out := flag.CommandLine.Output()
-		fmt.Fprintf(out, "Usage: mongo2git [options]\n")
-		fmt.Fprintf(out, "\nRequired:\n")
-		fmt.Fprintf(out, "  --mongo-uri, -m         MongoDB connection URI (or MONGO_URI env)\n")
-		fmt.Fprintf(out, "  --mongo-collection, -c  MongoDB collection to dump (or MONGO_COLLECTION env)\n")
-		fmt.Fprintf(out, "  --dump-dir, -d          Subdirectory for dumped JSON files (or DUMP_DIR env)\n")
-		fmt.Fprintf(out, "  --clone-dir, -g         Local directory for cloned git repo (or CLONE_DIR env)\n")
-		fmt.Fprintf(out, "  --repo-url, -r          Git repo SSH URL (or REPO_URL env)\n")
-		fmt.Fprintf(out, "\nOptional:\n")
-		fmt.Fprintf(out, "  --git-branch, -b        Git branch to push to (or GIT_BRANCH env, default: main)\n")
-		fmt.Fprintf(out, "  --slack-webhook-url, -s Slack incoming webhook URL (or SLACK_WEBHOOK_URL env)\n")
-		fmt.Fprintf(out, "  --local, -L             Commit only, no push; log notifications instead of Slack\n")
-		fmt.Fprintf(out, "  --version, -v           Print version and exit\n")
+		_, _ = fmt.Fprintf(out, "Usage: mongo2git [options]\n")
+		_, _ = fmt.Fprintf(out, "\nRequired:\n")
+		_, _ = fmt.Fprintf(out, "  --mongo-uri, -m         MongoDB connection URI (or MONGO_URI env)\n")
+		_, _ = fmt.Fprintf(out, "  --mongo-collection, -c  MongoDB collection to dump (or MONGO_COLLECTION env)\n")
+		_, _ = fmt.Fprintf(out, "  --dump-dir, -d          Subdirectory for dumped JSON files (or DUMP_DIR env)\n")
+		_, _ = fmt.Fprintf(out, "  --clone-dir, -g         Local directory for cloned git repo (or CLONE_DIR env)\n")
+		_, _ = fmt.Fprintf(out, "  --repo-url, -r          Git repo SSH URL (or REPO_URL env)\n")
+		_, _ = fmt.Fprintf(out, "\nOptional:\n")
+		_, _ = fmt.Fprintf(out, "  --git-branch, -b        Git branch to push to (or GIT_BRANCH env, default: main)\n")
+		_, _ = fmt.Fprintf(out, "  --slack-webhook-url, -s Slack incoming webhook URL (or SLACK_WEBHOOK_URL env)\n")
+		_, _ = fmt.Fprintf(out, "  --local, -L             Commit only, no push; log notifications instead of Slack\n")
+		_, _ = fmt.Fprintf(out, "  --version, -v           Print version and exit\n")
 	}
 
 	flag.Parse()
@@ -160,7 +160,7 @@ func (c Config) Validate() error {
 	if err != nil {
 		return fmt.Errorf("parent of CLONE_DIR %s is not writable: %w", parent, err)
 	}
-	f.Close()
-	os.Remove(f.Name())
+	_ = f.Close()
+	_ = os.Remove(f.Name())
 	return nil
 }

@@ -42,7 +42,7 @@ func TestWriteDocument(t *testing.T) {
 func TestWriteDocumentNested(t *testing.T) {
 	cloneDir := t.TempDir()
 	doc := bson.M{
-		"_id": "nested-doc",
+		"_id":     "nested-doc",
 		"profile": bson.M{"name": "Alice", "email": "alice@example.com"},
 		"tags":    bson.A{"go", "mongodb", "git"},
 	}
@@ -64,8 +64,8 @@ func TestWriteDocumentNested(t *testing.T) {
 
 func TestWriteDocument_UnwritablePath(t *testing.T) {
 	parent := t.TempDir()
-	os.Chmod(parent, 0o000)
-	t.Cleanup(func() { os.Chmod(parent, 0o755) })
+	_ = os.Chmod(parent, 0o000)
+	t.Cleanup(func() { _ = os.Chmod(parent, 0o755) })
 
 	doc := bson.M{"_id": "doc-a", "value": 1}
 	err := WriteDocument(parent, "data", "doc-a", doc)

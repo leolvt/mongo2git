@@ -11,14 +11,14 @@ import (
 func initTestRepo(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
-	runGit(dir, "init")
-	runGit(dir, "config", "user.email", "test@test.com")
-	runGit(dir, "config", "user.name", "Test")
-	os.WriteFile(filepath.Join(dir, "README.md"), []byte("# Test"), 0644)
-	runGit(dir, "add", "README.md")
-	runGit(dir, "commit", "-m", "initial")
+	_ = runGit(dir, "init")
+	_ = runGit(dir, "config", "user.email", "test@test.com")
+	_ = runGit(dir, "config", "user.name", "Test")
+	_ = os.WriteFile(filepath.Join(dir, "README.md"), []byte("# Test"), 0644)
+	_ = runGit(dir, "add", "README.md")
+	_ = runGit(dir, "commit", "-m", "initial")
 	// Allow pushing to this non-bare repo during tests.
-	runGit(dir, "config", "receive.denyCurrentBranch", "ignore")
+	_ = runGit(dir, "config", "receive.denyCurrentBranch", "ignore")
 	return dir
 }
 
@@ -50,9 +50,9 @@ func TestPrepare_FetchReset(t *testing.T) {
 	}
 
 	// Add a new file to the remote
-	os.WriteFile(filepath.Join(remote, "newfile.txt"), []byte("hello"), 0644)
-	runGit(remote, "add", "newfile.txt")
-	runGit(remote, "commit", "-m", "add newfile")
+	_ = os.WriteFile(filepath.Join(remote, "newfile.txt"), []byte("hello"), 0644)
+	_ = runGit(remote, "add", "newfile.txt")
+	_ = runGit(remote, "commit", "-m", "add newfile")
 
 	// Second Prepare should fetch and reset
 	if err := r.Prepare(); err != nil {
@@ -92,8 +92,8 @@ func TestCommitAndPush_WithChanges(t *testing.T) {
 	}
 
 	// Write a document file
-	os.MkdirAll(filepath.Join(cloneDir, "data"), 0755)
-	os.WriteFile(filepath.Join(cloneDir, "data", "doc.json"), []byte(`{"hello":"world"}`), 0644)
+	_ = os.MkdirAll(filepath.Join(cloneDir, "data"), 0755)
+	_ = os.WriteFile(filepath.Join(cloneDir, "data", "doc.json"), []byte(`{"hello":"world"}`), 0644)
 
 	changed, err := r.CommitAndPush("2024-01-01T00-00-00Z", 1)
 	if err != nil {

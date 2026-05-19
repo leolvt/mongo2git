@@ -66,7 +66,7 @@ func TestNotifier_Success(t *testing.T) {
 func TestNotifier_Failure(t *testing.T) {
 	var received struct{ Text string }
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		json.NewDecoder(r.Body).Decode(&received)
+		_ = json.NewDecoder(r.Body).Decode(&received)
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer server.Close()

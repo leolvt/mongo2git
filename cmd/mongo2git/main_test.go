@@ -15,8 +15,8 @@ import (
 
 type failingRepo struct{ err error }
 
-func (r *failingRepo) Prepare() error                                    { return nil }
-func (r *failingRepo) CommitAndPush(string, int) (bool, error)           { return false, r.err }
+func (r *failingRepo) Prepare() error                          { return nil }
+func (r *failingRepo) CommitAndPush(string, int) (bool, error) { return false, r.err }
 
 func TestRun_Success(t *testing.T) {
 	cfg := config.Config{
