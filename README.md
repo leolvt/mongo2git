@@ -118,4 +118,4 @@ MIT — see [LICENSE](LICENSE).
 
 ---
 
-*This project was developed with the assistance of [Pi](https://earendil.io/pi), an AI coding agent.*
+*This project was developed with the assistance of [Pi](https://pi.dev), an AI coding agent.*
