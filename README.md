@@ -105,6 +105,39 @@ export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..."
 mongo2git
 ```
 
+## Development
+
+This project uses [mise](https://mise.jdx.dev/) for tool management and [lefthook](https://github.com/evilmartians/lefthook) for git hooks.
+
+```bash
+# Install tools (go, golangci-lint, goreleaser, lefthook, make)
+mise install
+
+# Install git hooks
+mise x -- lefthook install
+
+# Run hooks manually
+mise x -- lefthook run pre-commit
+mise x -- lefthook run pre-push
+```
+
+### Pre-commit hooks
+
+| Hook | Description | Auto-fix |
+|---|---|---|
+| `make fmt` | Format Go code with `gofmt` | ✅ (staged) |
+| `make tidy` | Tidy Go modules | ✅ (staged) |
+| `make vet` | Run `go vet` | — |
+| `make lint` | Run `golangci-lint` | — |
+
+### Pre-push hooks
+
+| Hook | Description |
+|---|---|
+| `make test` | Run tests with race detection |
+| `make build` | Verify all packages compile |
+| `make release-check` | Validate GoReleaser config |
+
 ## Requirements
 
 - [Go](https://go.dev/) 1.26+

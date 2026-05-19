@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/evilmartians/lefthook/master/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj :
+
+pre-commit:
+  parallel: true
+  commands:
+    fmt:
+      run: make fmt
+      glob: "*.go"
+      stage_fixed: true
+      skip:
+        - merge
+        - rebase
+    tidy:
+      run: make tidy
+      glob: "*.go"
+      stage_fixed: true
+      skip:
+        - merge
+        - rebase
+    vet:
+      run: make vet
+      glob: "*.go"
+      skip:
+        - merge
+        - rebase
+    lint:
+      run: make lint
+      glob: "*.go"
+      skip:
+        - merge
+        - rebase
+
+pre-push:
+  parallel: true
+  commands:
+    test:
+      run: make test
+    build:
+      run: make build
+    release-check:
+      run: make release-check
