@@ -11,7 +11,7 @@ import (
 func initTestRepo(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
-	_ = runGit(dir, "init")
+	_ = runGit(dir, "init", "-b", "main")
 	_ = runGit(dir, "config", "user.email", "test@test.com")
 	_ = runGit(dir, "config", "user.name", "Test")
 	_ = os.WriteFile(filepath.Join(dir, "README.md"), []byte("# Test"), 0644)
@@ -90,6 +90,10 @@ func TestCommitAndPush_WithChanges(t *testing.T) {
 	if err := r.Prepare(); err != nil {
 		t.Fatalf("Prepare() = %v", err)
 	}
+
+	// Configure git identity in the clone (needed in CI where no global config exists).
+	_ = runGit(cloneDir, "config", "user.email", "test@test.com")
+	_ = runGit(cloneDir, "config", "user.name", "Test")
 
 	// Write a document file
 	_ = os.MkdirAll(filepath.Join(cloneDir, "data"), 0755)
