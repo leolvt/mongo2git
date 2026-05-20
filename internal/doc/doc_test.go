@@ -62,6 +62,49 @@ func TestWriteDocumentNested(t *testing.T) {
 	}
 }
 
+func TestWriteDocument_Deterministic(t *testing.T) {
+	// Same document written twice must produce byte-for-byte identical output.
+	cloneDir := t.TempDir()
+	doc := bson.M{
+		"zebra": 1,
+		"alpha": "first",
+		"mike":  bson.M{"nested2": 2, "nested1": 1},
+		"_id":   "det-test",
+		"arr":   bson.A{bson.M{"b": 2, "a": 1}, "scalar"},
+	}
+
+	if err := WriteDocument(cloneDir, "data", "det", doc); err != nil {
+		t.Fatalf("first write: %v", err)
+	}
+	first, err := os.ReadFile(filepath.Join(cloneDir, "data", "det.json"))
+	if err != nil {
+		t.Fatalf("read first: %v", err)
+	}
+
+	if err := WriteDocument(cloneDir, "data", "det", doc); err != nil {
+		t.Fatalf("second write: %v", err)
+	}
+	second, err := os.ReadFile(filepath.Join(cloneDir, "data", "det.json"))
+	if err != nil {
+		t.Fatalf("read second: %v", err)
+	}
+
+	if string(first) != string(second) {
+		t.Errorf("non‑deterministic output:\n--- first ---\n%s\n--- second ---\n%s", first, second)
+	}
+
+	// Verify keys appear in alphabetical order at the top level.
+	content := string(first)
+	idIdx := strings.Index(content, "\"_id\"")
+	alphaIdx := strings.Index(content, "\"alpha\"")
+	arrIdx := strings.Index(content, "\"arr\"")
+	mikeIdx := strings.Index(content, "\"mike\"")
+	zebraIdx := strings.Index(content, "\"zebra\"")
+	if idIdx >= alphaIdx || alphaIdx >= arrIdx || arrIdx >= mikeIdx || mikeIdx >= zebraIdx {
+		t.Errorf("keys not in alphabetical order:\n%s", content)
+	}
+}
+
 func TestWriteDocument_UnwritablePath(t *testing.T) {
 	parent := t.TempDir()
 	_ = os.Chmod(parent, 0o000)

@@ -17,7 +17,7 @@ func WriteDocument(cloneDir, dumpDir, docID string, doc bson.M) error {
 		return fmt.Errorf("mkdir %s: %w", dir, err)
 	}
 
-	extJSON, err := bson.MarshalExtJSONIndent(doc, false, false, "", "  ")
+	extJSON, err := bson.MarshalExtJSONIndent(SortDocument(doc), false, false, "", "  ")
 	if err != nil {
 		return fmt.Errorf("marshal document %s: %w", docID, err)
 	}
