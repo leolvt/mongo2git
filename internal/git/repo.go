@@ -33,8 +33,9 @@ func NewRepo(cloneDir, repoURL, branch string, local bool) *GitRepo {
 	}
 }
 
-// Prepare ensures the repository exists and is up to date.
-// Clones if missing; otherwise fetches and hard-resets.
+// Prepare ensures the repository exists and is on the configured branch.
+// Clones if missing; otherwise fetches, cleans leftovers, and checks out
+// the target branch.
 func (r *GitRepo) Prepare() error {
 	gitDir := filepath.Join(r.cloneDir, ".git")
 	if _, err := os.Stat(gitDir); os.IsNotExist(err) {
@@ -43,14 +44,20 @@ func (r *GitRepo) Prepare() error {
 		if err := os.MkdirAll(parent, 0755); err != nil {
 			return fmt.Errorf("mkdir %s: %w", parent, err)
 		}
-		return runGit(parent, "clone", r.repoURL, r.cloneDir)
+		return runGit(parent, "clone", "--branch", r.branch, r.repoURL, r.cloneDir)
 	}
 
 	if err := runGit(r.cloneDir, "fetch", "origin"); err != nil {
 		return fmt.Errorf("git fetch: %w", err)
 	}
-	if err := runGit(r.cloneDir, "reset", "--hard", "origin/"+r.branch); err != nil {
-		return fmt.Errorf("git reset: %w", err)
+	// Clean up any leftover dirt from a previous failed run
+	// so that checkout can proceed without conflicts.
+	_ = runGit(r.cloneDir, "reset", "--hard", "HEAD")
+	_ = runGit(r.cloneDir, "clean", "-fd")
+	// checkout -B creates the branch if new, resets it if it
+	// already exists, and switches to it — all in one command.
+	if err := runGit(r.cloneDir, "checkout", "-B", r.branch, "origin/"+r.branch); err != nil {
+		return fmt.Errorf("git checkout %s: %w", r.branch, err)
 	}
 	return nil
 }
@@ -84,7 +91,7 @@ func (r *GitRepo) CommitAndPush(timestamp string, docCount int) (bool, error) {
 		return true, nil
 	}
 
-	if err := runGit(r.cloneDir, "push", "origin", "HEAD"); err != nil {
+	if err := runGit(r.cloneDir, "push", "origin", r.branch); err != nil {
 		return false, fmt.Errorf("git push: %w", err)
 	}
 	slog.Info("pushed to origin")
