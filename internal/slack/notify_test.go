@@ -9,13 +9,13 @@ import (
 )
 
 func TestNotifier_Local(t *testing.T) {
-	n := NewNotifier("https://hooks.slack.com/services/xxx", "my-coll", true)
+	n := NewNotifier("https://hooks.slack.com/services/xxx", "my-coll", "git@github.com:user/repo.git", "main", "test-host.local", true)
 	n.Notify(true, "2024-01-01T00-00-00Z", 42, "")
 	// Should not panic or make HTTP calls.
 }
 
 func TestNotifier_NoWebhook(t *testing.T) {
-	n := NewNotifier("", "my-coll", false)
+	n := NewNotifier("", "my-coll", "git@github.com:user/repo.git", "staging", "test-host.local", false)
 	n.Notify(true, "2024-01-01T00-00-00Z", 10, "")
 	// Should return early without error.
 }
@@ -46,7 +46,7 @@ func TestNotifier_Success(t *testing.T) {
 	}))
 	defer server.Close()
 
-	n := NewNotifier(server.URL, "my-collection", false)
+	n := NewNotifier(server.URL, "my-collection", "git@github.com:org/backups.git", "production", "fqdn.example.com", false)
 	n.Notify(true, "2024-05-15T10-30-00Z", 99, "")
 
 	if !strings.Contains(received.Text, "my-collection") {
@@ -57,6 +57,12 @@ func TestNotifier_Success(t *testing.T) {
 	}
 	if !strings.Contains(received.Text, "✅") {
 		t.Errorf("expected success emoji, got: %s", received.Text)
+	}
+	if !strings.Contains(received.Text, "git@github.com:org/backups.git") {
+		t.Errorf("expected repo URL in payload, got: %s", received.Text)
+	}
+	if !strings.Contains(received.Text, "production") {
+		t.Errorf("expected branch in payload, got: %s", received.Text)
 	}
 	if len(received.Blocks) != 1 {
 		t.Errorf("expected 1 block, got %d", len(received.Blocks))
@@ -71,7 +77,7 @@ func TestNotifier_Failure(t *testing.T) {
 	}))
 	defer server.Close()
 
-	n := NewNotifier(server.URL, "failing-coll", false)
+	n := NewNotifier(server.URL, "failing-coll", "git@github.com:org/backups.git", "staging", "fqdn.example.com", false)
 	n.Notify(false, "2024-05-15T10-30-00Z", 0, "something broke")
 
 	if !strings.Contains(received.Text, "❌") {
@@ -82,6 +88,12 @@ func TestNotifier_Failure(t *testing.T) {
 	}
 	if !strings.Contains(received.Text, "something broke") {
 		t.Errorf("expected detail text, got: %s", received.Text)
+	}
+	if !strings.Contains(received.Text, "git@github.com:org/backups.git") {
+		t.Errorf("expected repo URL in payload, got: %s", received.Text)
+	}
+	if !strings.Contains(received.Text, "staging") {
+		t.Errorf("expected branch in payload, got: %s", received.Text)
 	}
 }
 

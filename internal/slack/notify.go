@@ -20,15 +20,21 @@ type Notifier interface {
 type SlackNotifier struct {
 	webhookURL     string
 	collectionName string
+	repoURL        string
+	branch         string
+	hostname       string
 	local          bool
 }
 
-// NewNotifier creates a SlackNotifier. If local is true, notifications are
-// logged instead of sent.
-func NewNotifier(webhookURL, collectionName string, local bool) *SlackNotifier {
+// NewNotifier creates a SlackNotifier with the given hostname. If local is
+// true, notifications are logged instead of sent.
+func NewNotifier(webhookURL, collectionName, repoURL, branch, hostname string, local bool) *SlackNotifier {
 	return &SlackNotifier{
 		webhookURL:     webhookURL,
 		collectionName: collectionName,
+		repoURL:        repoURL,
+		branch:         branch,
+		hostname:       hostname,
 		local:          local,
 	}
 }
@@ -42,8 +48,8 @@ func (n *SlackNotifier) Notify(success bool, timestamp string, docCount int, det
 		status = "failed"
 	}
 
-	body := fmt.Sprintf("%s *%s backup* %s\n• %d documents\n• Timestamp: `%s`",
-		emoji, n.collectionName, status, docCount, timestamp)
+	body := fmt.Sprintf("%s *%s backup* %s\n• %d documents\n• Timestamp: `%s`\n• Host: `%s`\n• Repository: `%s` (branch: `%s`)",
+		emoji, n.collectionName, status, docCount, timestamp, n.hostname, n.repoURL, n.branch)
 	if detail != "" {
 		body += "\n• " + detail
 	}

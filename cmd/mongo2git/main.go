@@ -12,6 +12,7 @@ import (
 	"github.com/leolvt/mongo2git/internal/config"
 	"github.com/leolvt/mongo2git/internal/doc"
 	"github.com/leolvt/mongo2git/internal/git"
+	"github.com/leolvt/mongo2git/internal/hostname"
 	"github.com/leolvt/mongo2git/internal/mongo"
 	"github.com/leolvt/mongo2git/internal/slack"
 
@@ -24,6 +25,8 @@ var date = "unknown"
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{AddSource: true})))
+	host := hostname.ResolveFQDN()
+	slog.SetDefault(slog.With("host", host))
 
 	cfg, err := config.ParseFlags()
 	if err != nil {
@@ -61,7 +64,7 @@ func main() {
 	defer cleanup()
 
 	repo := git.NewRepo(cfg.CloneDir, cfg.RepoURL, cfg.GitBranch, cfg.Local)
-	notifier := slack.NewNotifier(cfg.SlackURL, cfg.CollectionName, cfg.Local)
+	notifier := slack.NewNotifier(cfg.SlackURL, cfg.CollectionName, cfg.RepoURL, cfg.GitBranch, host, cfg.Local)
 
 	if err := run(ctx, cfg, fetcher, repo, notifier, timestamp); err != nil {
 		slog.Error("fatal error", "error", err)
